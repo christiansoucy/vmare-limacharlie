@@ -1,4 +1,4 @@
-# End Point Detection with VMware and LimaCharlie
+# End Point Detection and Response with VMware and LimaCharlie
 
 
 ## Introduction
