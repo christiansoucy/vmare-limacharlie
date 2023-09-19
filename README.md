@@ -101,6 +101,12 @@ The architecture of this lab consists of the following components:
     - In a ransomware scenario this rule would eb effective because the parent process is liekly the payload or lateral movement which would be terminated.
     - There is however another and better way of writing this rule. the current rules relies on a literal matching of the string "vssadmin delete shadows /all". The weakness here is that even an extra space somewhere will break the rule. Taking this into consideration we can use the "contains" operator. This will avoid the literal issue.
       ![shadowrule1](https://i.imgur.com/FOmYnYo.png)
+    - Lastly we'll put the new rule to the test with Florian's ransomware simulator. The simulator works by simply copying itself to WORD.exe. WORD.exe then simulates a macro-enabled document execution which is followed by deleting volume shadow copies. Next it creates 10,000 files and encrypts them. Considering this it should be apparent where our detection and response should break this ransomware. The image below is from Lima Detections and we can see first that the Sigma rule picked up on the shadow copies deletion then immediately our custom detection and response kills the parent process. This results in the file creation and encryption never happening.
+      ![shadowrule2](https://i.imgur.com/pwZzPFo.png)
+      ![shadowrule2](https://i.imgur.com/QWKZ7UX.png)
+      
+       
+
     
       
       
