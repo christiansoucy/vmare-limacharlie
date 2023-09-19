@@ -59,12 +59,12 @@ The architecture of this lab consists of the following components:
     - Back on the Wndows VM I will just manually execute our C2 implant.exe within an administrative Powershell
     - We should see our C2 session appear in the Sliver console
       ![Sliver](https://i.imgur.com/9WzEhqH.png)
-    - Typing "session" into the Sliver console we can take note of our session ID as well as confirm it's active
+    - Entering the "session" command into the Sliver console we can take note of our session ID.
     - Next we can interact with our C2 session by using the command "use [session_id]" in the Sliver console
     - Now we can start exploring our windows system with some simple commands like "info", "whoami", and "getprivs", then identify our working directory with "pwd" and examine network conncetions with "netstat"
     - If we run the command "ps -t" we can view running processes on the Windows system and note how Sliver will highlight it's own processes in green and detect defensive tools in red. This is a good example of how attackers can become aware of defensive tools a victim might be using
       ![Sliver](https://i.imgur.com/9qPc4Km.png)
-8. Observer EDR Telemetry thus far
+8. Observer Some EDR Telemetry 
     - Now we can hop into the LimaCharlie UI and check out some of the telemetry that has been collected from our end point
     - First look at some processes and spend some time exploring. Take note that LimaCharlie does a nice job of showing processes that are signed and ones that are not. A process that carries a valid signature is often going to be benign itself, although legitimate processes can be used to launch a malicious process or code. Below shows our payload as an unsigned processs (missing the green check) as well as an indicator that it is "listening".
        ![Sliver](https://i.imgur.com/cKMLdR0.png)
@@ -72,7 +72,31 @@ The architecture of this lab consists of the following components:
       ![Network Connection](https://i.imgur.com/rwyIODK.png)
     - Next we can explore the File System through Lima and find our payload in the downloads section. From there we can search the file hash in Virustotal although there is nothing found as we just created a new payload. This is a good time for a lesson, just because a hash is not found on Virustotal it does not mean that it is innocent.
     - We continue to explore through LimaCharlie and learn what it can show us and how we can further use the information to investigate as well as start to build detection and response.
-9. 
+9. Perform Some Adversarial Actions
+    - Let's run a "getprivs" command and see what kind of privileges we have on the compromised host (Windows VM). The primary one we are looking for is SeDebugPrivilege, if this is enbaled then we should have all the privileges we need on the system. Fortunately for this lab we know we have this because we executed the payload in the Windows VM with administrative rights. Let's check it anyway.
+       ![getprivs](https://i.imgur.com/5Q7oDwF.png)
+    - Now that we know we have the privileges, let's make a move that is popular for stealingf credentials and dump the lsass.exe process from memory. Use the command "procdump -n lsass.exe -s lsass.dmp". This will dump the process from memory and save it locally on the C2 server. This step is really only done to detect the dump with LimaCharlie but it is also a good chance to later learn more about how this technique is used and try it for ourselves.
+10. Let's Detect
+    - We've done something malicious, now let's switch to Lima and examine it. Since lsass.exe is a sensitive process that is targeted by credential targeting tools, any good EDR will generate events for it.
+    - Looking into the Timeline of the Windows VM in Lima we can filter for SENSITIVE_PROCESS_ACCESS events. For this lab there won't be much on the system that is legitimately accessing lsass so we can be assured that the events we see are from our procdump.
+      ![lsass](https://i.imgur.com/meZi60L.png)
+    - Knowing what the event looks like when credential access occurs we can use that information to create a detection and response rule in Lima which would alert us anytime actvity that matches occurs. The rules in Lima are written in YAML. Breaking the below rule down. First we have the detection portion of the rule: look for event type SENSITIVE_PROCESS_ACCESS (event) which ends with (op) lsass.exe (value) in the given (path). This rule as is would be very noisy in a real world scenario and need further tuning but for simplicity in this lab it works. The second part of the rule is the response which is a simple alert. We call out an (action) to report and the (name) should be LSASS access.
+      ![lsassrule](https://i.imgur.com/4GVAxYP.png)
+    - After putting the bad actor hat on once again and running our proc dump, we can go back to Lima and look at the Detections tab. Here we now see our newly created LSASS access detection rule reporting in after another credential access attempt
+      ![lsassdetect](https://i.imgur.com/7q8K58D.png)
+    - These last few steps have given us the framework to go and explore, seeing what more we can do with the C2 and what other rules we can craft as well as tune. I will surely be playing more with these in the near future and update this project but for now let's move on to a couple more attacks and rules, even throwing in some attack blocking!
+11. Blocking Attacks with EDR
+    - The most critical aspect of blocking with EDr certainly seems to be baselining the environment. False positives with a blocking rule in effect are far different than a simply alert which you can investigate while the enviroment goes along on it's merry way. Now we are talking abouta rule that can stop processes and cause real problems if it's just firing off on a mutlitude of false positives.
+    - The rule we are going to create for this step involves Volume Shadow Copies. Volume shadow copies provide and eay way to restore files or a file system. This is one of the most attractive options for recovering from a ransomware attack and thus makes the deletion of the volume shadow copies a good sign of a ransomware attack.
+    - We'll use a basic command to delete these "vssadmin delete shadows /all". This command is a good candidate for a blocking rule as it has low false positive rates and a high threat activity indicator. It's not a command that is commonly run in a healthy environment.
+    - As in the past exercise we'll execute this commmand with our C2 session so we can later use its process in Lima to craft a detection and response rule.
+    - After running the command on our C2 server, we jump back into the Lima Detection tab. The default Sigma rules should already have picked up on this activity which can be seen below.
+      ![shadowcopies](https://i.imgur.com/lpybkfc.png)
+    - Clicking on View Event Timeline we can quickly move to building a new detection and response rule. The detection portion of the rule is created automatically by Lima then we add the Response. The rule simply says when you see this then kill the parent process. Here is what the rule looks like:
+      ![shadowrule1](https://i.imgur.com/xZwtJHL.png)
+    - In a ransomware scenario this rule would eb effective because the parent process is liekly the payload or lateral movement which would be terminated.
+    - There is however another and better way of writing this rule. the current rules relies on a literal matching of the string "vssadmin delete shadows /all". The weakness here is that even an extra space somewhere will break the rule. Taking this into consideration we can use the "contains" operator. This will avoid the literal issue.
+      ![shadowrule1](https://i.imgur.com/FOmYnYo.png)
     
       
       
