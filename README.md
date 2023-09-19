@@ -20,7 +20,7 @@ The architecture of this lab consists of the following components:
 
 ## Set up the virtual environment
 
-1. *Download and install VMware Workstation Pro 17*
+- *Download and install VMware Workstation Pro 17*
     - I chose to buy the Pro version instead of the free trial since I plan on utilizing it a lot more in the future
 2. *Download and deploy a VMware evalustion version of Windows 11 from Microsoft*
 3. *Download and install Ubuntu Server 22.04.1*
