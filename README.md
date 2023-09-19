@@ -1,4 +1,4 @@
-# End Point Detection and Response Lab
+# *End Point Detection and Response Lab*
 
 ![Logo Bar](https://i.imgur.com/iePpCDH.png)
 
