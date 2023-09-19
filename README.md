@@ -1,4 +1,4 @@
-# End Point Detection and Response with VMware and LimaCharlie
+# End Point Detection and Response Lab
 
 ![Logo Bar](https://i.imgur.com/iePpCDH.png)
 
