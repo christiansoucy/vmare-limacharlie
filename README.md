@@ -1,5 +1,6 @@
 # End Point Detection and Response with VMware and LimaCharlie
 
+![Logo Bar](https://i.imgur.com/iePpCDH.png)
 
 ## Introduction
 
