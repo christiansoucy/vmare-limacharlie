@@ -104,7 +104,28 @@ The architecture of this lab consists of the following components:
     - Lastly we'll put the new rule to the test with Florian's ransomware simulator. The simulator works by simply copying itself to WORD.exe. WORD.exe then simulates a macro-enabled document execution which is followed by deleting volume shadow copies. Next it creates 10,000 files and encrypts them. Considering this it should be apparent where our detection and response should break this ransomware. The image below is from Lima Detections and we can see first that the Sigma rule picked up on the shadow copies deletion then immediately our custom detection and response kills the parent process. This results in the file creation and encryption never occuring.
       ![shadowrule2](https://i.imgur.com/pwZzPFo.png)
       ![shadowrule2](https://i.imgur.com/QWKZ7UX.png)
-      
+
+
+## Conclusion
+
+
+In this End Point Detection and Response (EDR) lab, we have successfully set up a virtual environment comprising Windows 11 and Ubuntu Server virtual machines. We integrated LimaCharlie as our EDR solution to monitor and respond to potential threats. The lab involved several key steps:
+
+1. **Virtual Environment Setup**: We configured our virtual environment using VMware Workstation Pro, installed Windows 11 and Ubuntu Server, and made necessary configurations on the Windows VM, including disabling security features and installing Sysmon.
+
+2. **LimaCharlie EDR Integration**: We set up LimaCharlie by creating an account, organization, and sensor to ingest data from our endpoint. This allowed us to monitor the Windows VM for suspicious activity.
+
+3. **Command and Control**: We initiated a command and control session using the Sliver framework on the Ubuntu Server to gain control of the Windows VM. We explored the compromised system, demonstrating how attackers can identify potential security tools.
+
+4. **Observing EDR Telemetry**: We examined the telemetry data collected by LimaCharlie, focusing on processes, network connections, and file system activity. This highlighted the importance of monitoring for potentially malicious behavior.
+
+5. **Adversarial Actions**: We conducted adversarial actions, such as dumping the lsass.exe process from memory, to simulate malicious activities. We then utilized LimaCharlie to detect and respond to these actions.
+
+6. **Creating Detection Rules**: We crafted detection rules in LimaCharlie, using YAML, to identify specific events or behaviors indicative of potential threats. This included rules for detecting sensitive process access and malicious actions.
+
+7. **Blocking Attacks with EDR**: We explored the concept of blocking attacks with EDR and created a rule to block the deletion of Volume Shadow Copies, a common indicator of ransomware activity. We demonstrated how this rule could effectively halt ransomware execution.
+
+Overall, this lab provided valuable insights into the capabilities of an EDR solution like LimaCharlie and the importance of monitoring, detection, and response in securing endpoints against various threats. It showcased the process of setting up a lab environment, conducting adversarial actions, and leveraging EDR to enhance security.
        
 
     
