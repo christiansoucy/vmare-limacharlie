@@ -4,7 +4,7 @@
 
 ## Introduction
 
-For this Lab I created a simple virtual envrionment using two VMware virtual machines and LimaCharlie end point detection and response (EDR). I added a sensore to ingest log data from our target VM, dropped a C2 payload created with Sliver, observed telemetry from the EDR, detected adversarial movements, and crafted detection and response rules.
+In this lab, I set up a straightforward virtual environment by deploying two VMware virtual machines and implementing LimaCharlie Endpoint Detection and Response (EDR). Within this environment, I configured a sensor to efficiently gather log data from a specific target VM. Subsequently, I deployed a C2 payload generated with Sliver, closely monitored the telemetry data produced by the EDR system, identified potentially adversarial activities, and skillfully formulated rules for detection and response.
 
 
 ## Architecture
